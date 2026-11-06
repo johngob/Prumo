@@ -18,12 +18,11 @@ resource "aws_ecr_lifecycle_policy" "web_policy" {
     rules = [
       {
         rulePriority = 1
-        description  = "Manter apenas as ultimas 2 imagens para reducao de custos"
+        description  = "Reter no maximo 2 imagens no repositorio para economizar custos"
         selection = {
-          tagStatus   = "untagged"
-          countType   = "sinceImagePushed"
-          countUnit   = "days"
-          countNumber = 1
+          tagStatus   = "any"
+          countType   = "imageCountMoreThan"
+          countNumber = 2
         }
         action = {
           type = "expire"
@@ -53,12 +52,11 @@ resource "aws_ecr_lifecycle_policy" "api_policy" {
     rules = [
       {
         rulePriority = 1
-        description  = "Manter apenas as ultimas 2 imagens para reducao de custos"
+        description  = "Reter no maximo 2 imagens no repositorio para economizar custos"
         selection = {
-          tagStatus   = "untagged"
-          countType   = "sinceImagePushed"
-          countUnit   = "days"
-          countNumber = 1
+          tagStatus   = "any"
+          countType   = "imageCountMoreThan"
+          countNumber = 2
         }
         action = {
           type = "expire"
