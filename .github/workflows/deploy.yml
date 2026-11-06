@@ -1,0 +1,72 @@
+name: Deploy to AWS ECS
+
+on:
+  push:
+    branches:
+      - main
+  workflow_dispatch: # Permite disparar manualmente pela interface do GitHub Actions
+
+permissions:
+  contents: read
+
+jobs:
+  build-and-push:
+    name: Build & Push Images (ECR)
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout do Código
+        uses: actions/checkout@v4
+
+      - name: Configurar Credenciais AWS
+        uses: aws-actions/configure-aws-credentials@v4
+        with:
+          aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          aws-region: ${{ secrets.AWS_REGION || 'us-east-1' }}
+
+      - name: Login no Amazon ECR
+        id: login-ecr
+        uses: aws-actions/amazon-ecr-login@v2
+
+      - name: Build e Push da Imagem da API NestJS
+        env:
+          ECR_REGISTRY: ${{ steps.login-ecr.outputs.registry }}
+          ECR_API_REPO: ${{ secrets.ECR_API_REPOSITORY || 'prumo-app-api' }}
+          IMAGE_TAG: ${{ github.sha }}
+        run: |
+          docker build -t $ECR_REGISTRY/$ECR_API_REPO:$IMAGE_TAG -t $ECR_REGISTRY/$ECR_API_REPO:latest src/api
+          docker push $ECR_REGISTRY/$ECR_API_REPO:$IMAGE_TAG
+          docker push $ECR_REGISTRY/$ECR_API_REPO:latest
+
+      - name: Build e Push da Imagem do Frontend Web Angular
+        env:
+          ECR_REGISTRY: ${{ steps.login-ecr.outputs.registry }}
+          ECR_WEB_REPO: ${{ secrets.ECR_WEB_REPOSITORY || 'prumo-app-web' }}
+          IMAGE_TAG: ${{ github.sha }}
+        run: |
+          docker build -t $ECR_REGISTRY/$ECR_WEB_REPO:$IMAGE_TAG -t $ECR_REGISTRY/$ECR_WEB_REPO:latest src/web
+          docker push $ECR_REGISTRY/$ECR_WEB_REPO:$IMAGE_TAG
+          docker push $ECR_REGISTRY/$ECR_WEB_REPO:latest
+
+  deploy:
+    name: Deploy to ECS Fargate (Manual Approval)
+    needs: build-and-push
+    runs-on: ubuntu-latest
+    environment:
+      name: production # Ambiente que exige aprovação manual no GitHub Actions
+
+    steps:
+      - name: Configurar Credenciais AWS
+        uses: aws-actions/configure-aws-credentials@v4
+        with:
+          aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          aws-region: ${{ secrets.AWS_REGION || 'us-east-1' }}
+
+      - name: Atualizar Servico no ECS Fargate (Force New Deployment)
+        env:
+          CLUSTER_NAME: ${{ secrets.ECS_CLUSTER_NAME || 'prumo-app-cluster' }}
+          SERVICE_NAME: ${{ secrets.ECS_SERVICE_NAME || 'prumo-app-service' }}
+        run: |
+          aws ecs update-service --cluster $CLUSTER_NAME --service $SERVICE_NAME --force-new-deployment

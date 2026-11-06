@@ -142,6 +142,15 @@ npm start
 
 ---
 
+## ☁️ Deploy na Nuvem (AWS)
+
+O projeto possui infraestrutura como código (IaC) via **Terraform** para provisionar o ambiente na AWS (ECS Fargate + PostgreSQL + ECR) e uma esteira automatizada no **GitHub Actions** para CI/CD a cada push na branch `main`.
+
+Para instruções completas de configuração e deploy, consulte:
+📖 [Guia de Deploy na AWS](docs/deploy-aws.md)
+
+---
+
 ## 🗄️ Migrations do Banco de Dados
 
 Toda alteração de schema deve ser realizada através de migrations do TypeORM, mantendo o histórico de alterações versionado.

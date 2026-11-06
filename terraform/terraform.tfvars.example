@@ -1,0 +1,76 @@
+# Arquivo de configuracao de variaveis para o Prumo (3 Containers)
+# Copie para 'terraform.tfvars' e configure conforme seu ambiente
+
+aws_region   = "us-east-1"
+project_name = "prumo-app"
+
+# Recursos de CPU e Memoria da Task (compartilhados entre Web, API e Banco)
+# 512 = 0.5 vCPU, 1024 = 1024 MB (1 GB RAM)
+task_cpu    = "512"
+task_memory = "1024"
+
+# 1. Frontend Web (Angular + Nginx)
+web_image = "prumo-app-web:latest" # Substituir pela URL do ECR apos criacao, ex: <id>.dkr.ecr.us-east-1.amazonaws.com/prumo-app-web:latest
+web_port  = 80
+
+# 2. Backend API (NestJS)
+api_image = "prumo-app-api:latest" # Substituir pela URL do ECR apos criacao, ex: <id>.dkr.ecr.us-east-1.amazonaws.com/prumo-app-api:latest
+api_port  = 3000
+
+api_environment_variables = [
+  {
+    name  = "NODE_ENV"
+    value = "production"
+  },
+  {
+    name  = "PORT"
+    value = "3000"
+  },
+  {
+    name  = "DB_HOST"
+    value = "localhost" # No ECS awsvpc, todos os containers compartilham localhost
+  },
+  {
+    name  = "DB_PORT"
+    value = "5432"
+  },
+  {
+    name  = "DB_NAME"
+    value = "prumodb"
+  },
+  {
+    name  = "DB_USER"
+    value = "prumouser"
+  },
+  {
+    name  = "DB_PASSWORD"
+    value = "PrumoPostgresSeguro123!"
+  },
+  {
+    name  = "JWT_SECRET"
+    value = "ChaveSecretaSuperSeguraPrumoTokenJWT2026"
+  },
+  {
+    name  = "JWT_EXPIRES_IN"
+    value = "24h"
+  }
+]
+
+# 3. Banco de Dados (PostgreSQL)
+db_image = "postgres:16-alpine"
+db_port  = 5432
+
+db_environment_variables = [
+  {
+    name  = "POSTGRES_DB"
+    value = "prumodb"
+  },
+  {
+    name  = "POSTGRES_USER"
+    value = "prumouser"
+  },
+  {
+    name  = "POSTGRES_PASSWORD"
+    value = "PrumoPostgresSeguro123!"
+  }
+]
