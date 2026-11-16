@@ -85,6 +85,25 @@ resource "aws_ecs_task_definition" "main" {
           "awslogs-stream-prefix" = "web"
         }
       }
+    },
+    # 4. Container DuckDNS Updater (Atualiza o IP dinamico a cada 5 minutos)
+    {
+      name      = "duckdns-updater"
+      image     = "curlimages/curl:latest"
+      essential = false
+      command   = [
+        "/bin/sh",
+        "-c",
+        "while true; do echo 'Atualizando DuckDNS...'; curl -s \"https://www.duckdns.org/update?domains=${var.duckdns_domain}&token=${var.duckdns_token}&verbose=true\"; echo ''; sleep 300; done"
+      ]
+      logConfiguration = {
+        logDriver = "awslogs"
+        options = {
+          "awslogs-group"         = aws_cloudwatch_log_group.ecs_logs.name
+          "awslogs-region"        = var.aws_region
+          "awslogs-stream-prefix" = "ddns"
+        }
+      }
     }
   ])
 

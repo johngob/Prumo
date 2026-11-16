@@ -125,9 +125,15 @@ Acesse no GitHub: **Settings > Secrets and variables > Actions > New repository 
 
 ## 🌐 Como Acessar a Aplicação
 
-Após a task iniciar:
-1. Obtenha o IP público via AWS CLI ou console do ECS.
-2. Acesse:
-   - **Aplicação Web:** `http://<IP_PUBLICO>` (Porta 80 padrão)
-   - **Swagger da API (Direto):** `http://<IP_PUBLICO>:3000/api`
-   - **Swagger da API (Via Proxy Web):** `http://<IP_PUBLICO>/api`
+A infraestrutura possui sincronização dinâmica automática com o **DuckDNS**. O container `duckdns-updater` descobre o IP público da task e atualiza o DNS periodicamente:
+
+- **Aplicação Web (Frontend):**  
+  👉 **`http://prumo-ind.duckdns.org`** (Porta 80 padrão)
+
+- **Documentação Swagger da API (Direto):**  
+  👉 **`http://prumo-ind.duckdns.org:3000/api`**
+
+- **IP Público Direto (Alternativa):**  
+  Caso queira consultar o IP temporário atribuído pela AWS:
+  Execute o comando fornecido no output do Terraform ou busque no console do ECS.
+

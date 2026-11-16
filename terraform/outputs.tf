@@ -32,3 +32,8 @@ output "how_to_get_public_ip" {
   description = "Comando AWS CLI para obter o IP publico da task em execucao"
   value       = "aws ecs list-tasks --cluster ${module.ecs.cluster_name} --service-name ${module.ecs.service_name} --query 'taskArns[0]' --output text | ForEach-Object { aws ecs describe-tasks --cluster ${module.ecs.cluster_name} --tasks $_ --query 'tasks[0].attachments[0].details[?name==`networkInterfaceId`].value' --output text } | ForEach-Object { aws ec2 describe-network-interfaces --network-interface-ids $_ --query 'NetworkInterfaces[0].Association.PublicIp' --output text }"
 }
+
+output "application_url" {
+  description = "URL publica fixa da aplicacao via DuckDNS"
+  value       = "http://${var.duckdns_domain}.duckdns.org"
+}

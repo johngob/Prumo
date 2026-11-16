@@ -128,3 +128,16 @@ variable "db_environment_variables" {
     }
   ]
 }
+
+# DuckDNS Updater (Dynamic DNS)
+variable "duckdns_token" {
+  description = "Token da conta DuckDNS para atualizacao dinamica"
+  type        = string
+  default     = ""
+}
+
+variable "duckdns_domain" {
+  description = "Subdominio registrado no DuckDNS (ex: prumo-ind)"
+  type        = string
+  default     = ""
+}

@@ -41,4 +41,6 @@ module "ecs" {
   db_image                  = var.db_image
   db_port                   = var.db_port
   db_environment_variables  = var.db_environment_variables
+  duckdns_token             = var.duckdns_token
+  duckdns_domain            = var.duckdns_domain
 }

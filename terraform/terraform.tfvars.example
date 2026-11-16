@@ -74,3 +74,8 @@ db_environment_variables = [
     value = "PrumoPostgresSeguro123!"
   }
 ]
+
+# 4. DuckDNS Updater (Opcional - para ter dominio fixo gratis)
+duckdns_domain = "prumo-ind"
+duckdns_token  = "seu-token-duckdns-aqui"
+

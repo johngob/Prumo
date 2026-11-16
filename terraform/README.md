@@ -68,20 +68,29 @@ terraform apply -auto-approve
 
 ## 🌐 Como Acessar a Aplicação
 
-Como não utilizamos Load Balancer para economizar custos, a task Fargate recebe um **IP público dinâmico**:
+A infraestrutura conta com sincronização dinâmica via **DuckDNS** (subdomínio fixo gratuito através do container `duckdns-updater` integrado na task):
 
-### Opção 1: Via Console AWS
+### Acesso Direto com Domínio Fixo
+- **Aplicação Web:** `http://<duckdns_domain>.duckdns.org` (ex: `http://prumo-ind.duckdns.org`)
+- **Documentação Swagger (API):** `http://<duckdns_domain>.duckdns.org:3000/api`
+
+---
+
+### Opção Alternativa: Via IP Público Dinâmico
+Como não utilizamos Load Balancer para economizar custos, a task Fargate também possui um IP público temporário atribuído pela AWS:
+
+#### Via Console AWS
 1. Acesse o **Amazon ECS** no console da AWS.
-2. Clique no cluster `projeto-aula-cluster` > aba **Tasks**.
+2. Clique no cluster `prumo-app-cluster` > aba **Tasks**.
 3. Clique na task que está no estado `RUNNING`.
 4. Na seção **Network**, copie o valor de **Public IP**.
-5. Abra no navegador: `http://<PUBLIC_IP>:<app_port>` (ex: `http://54.x.x.x:80`).
+5. Abra no navegador: `http://<PUBLIC_IP>` (Porta 80 padrão).
 
-### Opção 2: Via AWS CLI (PowerShell)
-Execute o comando retornado pelo output do Terraform:
+#### Via AWS CLI (PowerShell)
+Execute o comando retornado pelo output `how_to_get_public_ip` do Terraform:
 ```powershell
-$taskArn = aws ecs list-tasks --cluster projeto-aula-cluster --service-name projeto-aula-service --query 'taskArns[0]' --output text
-$eniId = aws ecs describe-tasks --cluster projeto-aula-cluster --tasks $taskArn --query 'tasks[0].attachments[0].details[?name==`networkInterfaceId`].value' --output text
+$taskArn = aws ecs list-tasks --cluster prumo-app-cluster --service-name prumo-app-service --query 'taskArns[0]' --output text
+$eniId = aws ecs describe-tasks --cluster prumo-app-cluster --tasks $taskArn --query 'tasks[0].attachments[0].details[?name==`networkInterfaceId`].value' --output text
 $publicIp = aws ec2 describe-network-interfaces --network-interface-ids $eniId --query 'NetworkInterfaces[0].Association.PublicIp' --output text
 
 Write-Host "URL da Aplicação: http://$publicIp"
