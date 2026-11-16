@@ -6,15 +6,17 @@ Este projeto provisiona uma infraestrutura na AWS usando **Terraform nativo** co
 
 ## 🏛️ Arquitetura
 
+- **Backend Remoto (Terraform State):**
+  - Armazenado no Amazon S3 (`prumo-app-tfstate-522348935231`), com versionamento e criptografia ativados. Permite que múltiplos computadores acessem e mantenham o mesmo estado sem risco de perda.
 - **VPC & Rede:**
   - 1 VPC (`10.0.0.0/16`)
   - 1 Subnet Pública com Internet Gateway (IGW) e rota pública.
 - **ECS Fargate (Single Task):**
-  - **1 Task Definition** contendo **2 containers**:
-    1. **Aplicação:** exposta diretamente na porta configurada (padrão: 80).
-    2. **Banco de Dados:** porta interna (padrão: 5432).
-  - **Comunicação App ⇄ Banco:** Como rodam na mesma task (`network_mode = awsvpc`), a aplicação conecta-se ao banco diretamente via `localhost:<porta>`.
-  - **Security Group:** Apenas a porta da aplicação fica aberta para a internet (`0.0.0.0/0`). O banco não recebe tráfego externo.
+  - **1 Task Definition** contendo **4 containers**:
+    1. **Frontend Web:** Nginx + Angular na porta 80.
+    2. **Backend API:** NestJS na porta 3000.
+    3. **Banco de Dados:** PostgreSQL 16 na porta 5432.
+    4. **DuckDNS Updater:** Atualiza o IP público da task dinamicamente para o subdomínio.
 - **Custo:** Praticamente \$0 em repouso. Em execução, consome apenas centavos por hora (fração de vCPU/RAM no Fargate).
 
 ---

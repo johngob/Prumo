@@ -43,6 +43,7 @@ Este documento descreve como a aplicação **Prumo** está estruturada para depl
 
 ### Por que essa divisão é vantajosa?
 - **Isolamento de dependências:** O frontend roda no Nginx (muito mais leve e veloz para arquivos estáticos), enquanto a API roda em Node.js Alpine puro.
+- **Backend Remoto no S3:** O arquivo de estado do Terraform (`terraform.tfstate`) fica centralizado em um bucket S3 versionado e criptografado (`prumo-app-tfstate-522348935231`), permitindo gerenciar a infraestrutura a partir de qualquer máquina ou ambiente com credenciais AWS configuradas.
 - **Proxy reverso integrado:** O Nginx do container Web repassa as chamadas de `/api/` diretamente para o container da API internamente (`127.0.0.1:3000`), eliminando qualquer problema de CORS.
 - **Rede unificada sem custo adicional:** Como rodam na mesma Task Fargate com `network_mode = "awsvpc"`, os 3 containers comunicam-se entre si via `localhost`.
 
