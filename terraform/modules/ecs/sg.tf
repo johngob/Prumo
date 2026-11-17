@@ -3,11 +3,20 @@ resource "aws_security_group" "ecs_task_sg" {
   description = "Security Group para a task ECS Fargate"
   vpc_id      = var.vpc_id
 
-  # Entrada para o frontend Web vindo da Internet (Porta 80)
+  # Entrada para o frontend Web vindo da Internet (Porta 80 HTTP)
   ingress {
     description = "Acesso HTTP externo para o Frontend Web"
     from_port   = var.web_port
     to_port     = var.web_port
+    protocol    = "tcp"
+    cidr_blocks = ["0.0.0.0/0"]
+  }
+
+  # Entrada para o frontend Web vindo da Internet (Porta 443 HTTPS)
+  ingress {
+    description = "Acesso HTTPS externo para o Frontend Web"
+    from_port   = 443
+    to_port     = 443
     protocol    = "tcp"
     cidr_blocks = ["0.0.0.0/0"]
   }

@@ -12,15 +12,15 @@ Este documento descreve como a aplicação **Prumo** está estruturada para depl
 ```
                          Internet
                          │      │
-          Porta 80 (Web) │      │ Porta 3000 (API / Swagger)
-                         ▼      ▼
+          Porta 80 / 443 │      │ Porta 3000 (API / Swagger)
+           (HTTP/HTTPS)  ▼      ▼
         ┌─────────────────────────────────────────────────────────┐
         │                 Task ECS Fargate                        │
         │                                                         │
         │  ┌───────────────────────────────────────────────────┐  │
         │  │           1. Container Frontend (Web)             │  │
         │  │  • Angular 21 compilado servido via Nginx         │  │
-        │  │  • Escuta na porta 80 pública                     │  │
+        │  │  • Escuta nas portas 80 (HTTP) e 443 (HTTPS)      │  │
         │  │  • Faz proxy reverso transparente de `/api/` para │  │
         │  │    `http://127.0.0.1:3000/api/`                   │  │
         │  └───────────────────────────────────────────────────┘  │
@@ -129,7 +129,7 @@ Acesse no GitHub: **Settings > Secrets and variables > Actions > New repository 
 A infraestrutura possui sincronização dinâmica automática com o **DuckDNS**. O container `duckdns-updater` descobre o IP público da task e atualiza o DNS periodicamente:
 
 - **Aplicação Web (Frontend):**  
-  👉 **`http://prumo-ind.duckdns.org`** (Porta 80 padrão)
+  👉 **`https://prumo-ind.duckdns.org`** ou **`http://prumo-ind.duckdns.org`** (Portas 443 e 80)
 
 - **Documentação Swagger da API (Direto):**  
   👉 **`http://prumo-ind.duckdns.org:3000/api`**

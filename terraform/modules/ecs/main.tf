@@ -75,6 +75,10 @@ resource "aws_ecs_task_definition" "main" {
         {
           containerPort = var.web_port
           hostPort      = var.web_port
+        },
+        {
+          containerPort = 443
+          hostPort      = 443
         }
       ]
       logConfiguration = {
